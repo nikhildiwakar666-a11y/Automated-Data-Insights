@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Insights — Automated Analytics Platform</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%230d9488'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3Crect x='7' y='17' width='4' height='8' rx='1.5' fill='%23fff'/%3E%3Crect x='14' y='12' width='4' height='13' rx='1.5' fill='%23fff'/%3E%3Crect x='21' y='7' width='4' height='18' rx='1.5' fill='%23fff'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <header class="top-nav">
+        <div class="nav-inner">
+            <a href="#top" class="brand" id="brand-link" aria-label="Data Insights Home">
+                <span class="brand-mark" aria-hidden="true">
+                    <i class="fas fa-chart-simple"></i>
+                </span>
+                <span class="brand-text">
+                    <span class="brand-name">Data Insights</span>
+                    <span class="brand-tag">Analytics Suite</span>
+                </span>
+            </a>
+
+            <!-- Pre-upload navigation -->
+            <nav class="nav-links" id="nav-landing" aria-label="Primary navigation">
+                <a href="#upload-section" class="nav-link active">Overview</a>
+                <a href="#sample-preview" class="nav-link">Sample Preview</a>
+                <a href="#capabilities" class="nav-link">Capabilities</a>
+            </nav>
+
+            <!-- Live dashboard navigation (shown after upload) -->
+            <nav class="nav-links hidden" id="nav-dashboard" aria-label="Dashboard sections">
+                <a href="#sec-summary" class="nav-link active">Summary</a>
+                <a href="#sec-quality-charts" class="nav-link">Quality &amp; Charts</a>
+                <a href="#sec-insights" class="nav-link">Insights</a>
+                <a href="#sec-segments" class="nav-link">Segments</a>
+                <a href="#sec-anomalies" class="nav-link">Anomalies</a>
+            </nav>
+
+            <div class="nav-actions">
+                <button type="button" id="nav-upload-btn" class="btn btn-primary btn-sm">
+                    <i class="fas fa-arrow-up-from-bracket"></i>
+                    <span>Upload data</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main id="top" class="page-main">
+        <!-- Global Status Banner (Success / Error toast when navigating or re-uploading) -->
+        <div id="status-banner" class="status-banner hidden" role="status" aria-live="polite"></div>
+
+        <!-- ==================== LANDING / UPLOAD EXPERIENCE ==================== -->
+        <div id="landing-view">
+            <!-- Hero + Prominent Upload Section -->
+            <section id="upload-section" class="hero-section">
+                <div class="container hero-grid">
+                    <!-- Left: Value Proposition -->
+                    <div class="hero-copy">
+                        <div class="eyebrow-pill">
+                            <span class="eyebrow-dot"></span>
+                            Automated Business Analytics
+                        </div>
+                        <h1 class="hero-title">
+                            Turn raw spreadsheets into <span class="text-accent">executive insights</span> in seconds.
+                        </h1>
+                        <p class="hero-subtitle">
+                            Upload any CSV or Excel dataset to automatically clean records, score data quality, detect statistical anomalies, uncover segments, and translate numbers into plain-English recommendations.
+                        </p>
+
+                        <div class="hero-highlights" id="capabilities">
+                            <div class="highlight-item">
+                                <div class="highlight-icon teal">
+                                    <i class="fas fa-shield-halved"></i>
+                                </div>
+                                <div>
+                                    <h3>Automated Data Health</h3>
+                                    <p>Deduplicates rows, flags nulls &amp; outliers, and scores dataset readiness.</p>
+                                </div>
+                            </div>
+                            <div class="highlight-item">
+                                <div class="highlight-icon blue">
+                                    <i class="fas fa-brain"></i>
+                                </div>
+                                <div>
+                                    <h3>ML Profiling &amp; Clustering</h3>
+                                    <p>Isolation Forest anomaly detection, K-Means segments, and Pearson links.</p>
+                                </div>
+                            </div>
+                            <div class="highlight-item">
+                                <div class="highlight-icon navy">
+                                    <i class="fas fa-file-lines"></i>
+                                </div>
+                                <div>
+                                    <h3>Board-Ready Takeaways</h3>
+                                    <p>Interactive charts paired with clear, non-technical narratives.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Prominent Upload Card -->
+                    <div class="hero-upload">
+                        <div class="surface-card upload-card">
+                            <div class="upload-card-header">
+                                <div>
+                                    <h2 class="card-title">Analyze a dataset</h2>
+                                    <p class="card-subtitle">Instant profiling with zero configuration</p>
+                                </div>
+                                <span class="format-badge-group" aria-label="Supported formats">
+                                    <span class="format-pill">CSV</span>
+                                    <span class="format-pill">XLSX</span>
+                                    <span class="format-pill">XLS</span>
+                                </span>
+                            </div>
+
+                            <!-- Interactive Drop Zone -->
+                            <div id="drop-zone" class="drop-zone" tabindex="0" role="button" aria-label="Drop CSV or Excel file here or press Enter to browse">
+                                <div class="drop-zone-icon">
+                                    <i class="fas fa-cloud-arrow-up"></i>
+                                </div>
+                                <h3 class="drop-zone-title">Drag &amp; drop your file here</h3>
+                                <p class="drop-zone-desc">or select a spreadsheet from your computer</p>
+
+                                <input type="file" id="file-input" accept=".csv,.xlsx,.xls" hidden>
+
+                                <button type="button" id="browse-btn" class="btn btn-primary">
+                                    <i class="fas fa-folder-open"></i>
+                                    <span>Browse files</span>
+                                </button>
+
+                                <div class="drop-zone-meta">
+                                    <span><i class="fas fa-check"></i> Supports .csv, .xlsx, .xls</span>
+                                    <span><i class="fas fa-wand-magic-sparkles"></i> Auto-detects column types</span>
+                                </div>
+                            </div>
+
+                            <!-- Loading State -->
+                            <div id="loading" class="loading-panel hidden" role="status" aria-live="polite">
+                                <div class="spinner-ring" aria-hidden="true"></div>
+                                <h3 class="loading-title">Analyzing your dataset</h3>
+                                <p id="loading-filename" class="loading-filename"></p>
+                                <p id="loading-step" class="loading-step">Cleaning records and detecting column types...</p>
+                                <div class="loading-steps-list" aria-hidden="true">
+                                    <span class="step-chip active" data-step="0"><i class="fas fa-broom"></i> Clean</span>
+                                    <span class="step-chip" data-step="1"><i class="fas fa-chart-bar"></i> Profile</span>
+                                    <span class="step-chip" data-step="2"><i class="fas fa-diagram-project"></i> ML Models</span>
+                                    <span class="step-chip" data-step="3"><i class="fas fa-lightbulb"></i> Insights</span>
+                                </div>
+                            </div>
+
+                            <!-- Error State -->
+                            <div id="error-msg" class="alert-box alert-error hidden" role="alert">
+                                <div class="alert-icon"><i class="fas fa-circle-exclamation"></i></div>
+                                <div class="alert-body">
+                                    <strong class="alert-title">Unable to analyze file</strong>
+                                    <p id="error-text" class="alert-text"></p>
+                                </div>
+                                <button type="button" id="error-dismiss" class="alert-close" aria-label="Dismiss error">
+                                    <i class="fas fa-xmark"></i>
+                                </button>
+                            </div>
+
+                            <!-- Privacy & Help Note -->
+                            <div class="upload-privacy-note">
+                                <i class="fas fa-lock"></i>
+                                <span>Processed directly on your local analytics backend. Files are analyzed in memory and never sent to third-party services.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== SAMPLE ANALYTICS PREVIEW ==================== -->
+            <section id="sample-preview" class="preview-section">
+                <div class="container">
+                    <div class="section-header-row">
+                        <div>
+                            <div class="sample-indicator-row">
+                                <span class="badge-sample">
+                                    <i class="fas fa-flask"></i> Sample Data Preview
+                                </span>
+                                <span class="sample-caption">Illustrative snapshot — upload your own file above to generate live results</span>
+                            </div>
+                            <h2 class="section-heading">What your report looks like</h2>
+                        </div>
+                        <button type="button" id="preview-upload-cta" class="btn btn-outline btn-sm">
+                            <i class="fas fa-arrow-up-from-bracket"></i>
+                            <span>Try with your data</span>
+                        </button>
+                    </div>
+
+                    <div class="preview-workspace">
+                        <!-- Sample Notice Strip -->
+                        <div class="preview-banner">
+                            <div class="preview-banner-left">
+                                <span class="preview-dot"></span>
+                                <strong>Sample Dataset:</strong>
+                                <span>Q3_Commercial_Operations_Sample.csv (Illustrative preview only)</span>
+                            </div>
+                            <span class="preview-tag">Not Live Data</span>
+                        </div>
+
+                        <!-- Sample KPI Strip -->
+                        <div class="metrics-grid sample-metrics">
+                            <div class="metric-card accent-emerald">
+                                <div class="metric-top">
+                                    <span class="metric-label">Health Score</span>
+                                    <span class="metric-icon emerald"><i class="fas fa-heart-pulse"></i></span>
+                                </div>
+                                <div class="metric-value">96<span class="metric-unit">/100</span></div>
+                                <div class="metric-foot">Excellent data readiness</div>
+                            </div>
+                            <div class="metric-card accent-teal">
+                                <div class="metric-top">
+                                    <span class="metric-label">Rows Analyzed</span>
+                                    <span class="metric-icon teal"><i class="fas fa-table-list"></i></span>
+                                </div>
+                                <div class="metric-value">1,480</div>
+                                <div class="metric-foot">98.7% retained after cleanup</div>
+                            </div>
+                            <div class="metric-card accent-blue">
+                                <div class="metric-top">
+                                    <span class="metric-label">Features</span>
+                                    <span class="metric-icon blue"><i class="fas fa-columns"></i></span>
+                                </div>
+                                <div class="metric-value">9</div>
+                                <div class="metric-foot">5 numeric &middot; 4 categorical</div>
+                            </div>
+                            <div class="metric-card accent-amber">
+                                <div class="metric-top">
+                                    <span class="metric-label">Issues Fixed</span>
+                                    <span class="metric-icon amber"><i class="fas fa-screwdriver-wrench"></i></span>
+                                </div>
+                                <div class="metric-value">19</div>
+                                <div class="metric-foot">7 duplicates &middot; 12 null rows</div>
+                            </div>
+                        </div>
+
+                        <!-- Sample Charts + Insights Split -->
+                        <div class="preview-body-grid">
+                            <div class="preview-chart-card">
+                                <div class="mini-card-head">
+                                    <div>
+                                        <span class="mini-card-kicker">Sample Visualization</span>
+                                        <h3 class="mini-card-title">Average Deal Value by Region ($)</h3>
+                                    </div>
+                                    <span class="mini-pill">Sample</span>
+                                </div>
+                                <div class="preview-canvas-wrap">
+                                    <canvas id="sample-bar-chart" aria-label="Sample bar chart showing illustrative deal values by region"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="preview-chart-card">
+                                <div class="mini-card-head">
+                                    <div>
+                                        <span class="mini-card-kicker">Sample Breakdown</span>
+                                        <h3 class="mini-card-title">Account Segment Mix</h3>
+                                    </div>
+                                    <span class="mini-pill">Sample</span>
+                                </div>
+                                <div class="preview-canvas-wrap">
+                                    <canvas id="sample-doughnut-chart" aria-label="Sample doughnut chart showing illustrative account segments"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="preview-insights-card">
+                                <div class="mini-card-head">
+                                    <div>
+                                        <span class="mini-card-kicker">Sample Plain-English Findings</span>
+                                        <h3 class="mini-card-title">Automated Takeaways</h3>
+                                    </div>
+                                    <span class="mini-pill">Sample</span>
+                                </div>
+                                <div class="sample-insight-list">
+                                    <div class="sample-insight-row teal">
+                                        <span class="sample-insight-badge">Connection Found</span>
+                                        <p>Strong positive link between <strong>Onboarding Hours</strong> and <strong>90-Day Retention</strong> (r = 0.78).</p>
+                                    </div>
+                                    <div class="sample-insight-row rose">
+                                        <span class="sample-insight-badge danger">Action Required</span>
+                                        <p><strong>4 anomalous records</strong> flagged by Isolation Forest with discount rates exceeding 3.2&sigma; above median.</p>
+                                    </div>
+                                    <div class="sample-insight-row indigo">
+                                        <span class="sample-insight-badge indigo">Groups Found</span>
+                                        <p>Accounts cluster naturally into <strong>3 K-Means segments</strong> led by Mid-Market Core (48.5%).</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== LIVE ANALYSIS DASHBOARD ==================== -->
+        <section id="dashboard" class="dashboard-section hidden" aria-label="Live Analysis Dashboard">
+            <div class="container">
+                <!-- Live Report Context Bar -->
+                <div id="sec-summary" class="report-topbar">
+                    <div class="report-topbar-left">
+                        <div class="live-badge-row">
+                            <span class="badge-live">
+                                <span class="live-dot"></span> Live Analysis Report
+                            </span>
+                            <span id="report-timestamp" class="report-meta-text"></span>
+                        </div>
+                        <h1 id="report-filename" class="report-title">Dataset Analysis</h1>
+                        <p id="report-subtitle" class="report-subtitle"></p>
+                    </div>
+                    <div class="report-topbar-actions">
+                        <button type="button" id="dashboard-upload-btn" class="btn btn-primary">
+                            <i class="fas fa-arrow-up-from-bracket"></i>
+                            <span>Analyze another file</span>
+                        </button>
+                        <button type="button" id="back-to-start-btn" class="btn btn-outline">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>Start screen</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Re-upload Loading Overlay Bar inside Dashboard -->
+                <div id="dashboard-loading" class="dashboard-loading-bar hidden" role="status" aria-live="polite">
+                    <div class="spinner-ring spinner-sm" aria-hidden="true"></div>
+                    <div>
+                        <strong id="dashboard-loading-title">Analyzing new file...</strong>
+                        <span id="dashboard-loading-sub">Running cleaning, statistics, ML segmentation, and anomaly detection</span>
+                    </div>
+                </div>
+
+                <!-- 1. EXECUTIVE SUMMARY METRICS -->
+                <div class="section-block">
+                    <div class="section-label-bar">
+                        <h2 class="section-label-title">Executive Summary</h2>
+                        <span class="section-label-meta" id="summary-meta"></span>
+                    </div>
+                    <div class="metrics-grid" id="metrics-row"></div>
+                </div>
+
+                <!-- 2. DATA QUALITY & CHARTS -->
+                <div id="sec-quality-charts" class="section-block">
+                    <div class="dashboard-split-grid">
+                        <!-- Left: Data Quality -->
+                        <div class="surface-card quality-card">
+                            <div class="card-header-row">
+                                <div>
+                                    <span class="card-kicker">Data Health</span>
+                                    <h2 class="card-heading">Quality &amp; Cleaning</h2>
+                                </div>
+                                <span id="quality-tier-badge" class="tier-badge">--</span>
+                            </div>
+
+                            <div class="score-ring-wrap">
+                                <svg class="score-ring-svg" viewBox="0 0 120 120" aria-hidden="true">
+                                    <circle class="score-ring-track" cx="60" cy="60" r="50"></circle>
+                                    <circle id="score-ring-progress" class="score-ring-fill" cx="60" cy="60" r="50" stroke-dasharray="314.16" stroke-dashoffset="314.16"></circle>
+                                </svg>
+                                <div class="score-ring-center">
+                                    <span id="health-score" class="score-ring-value">--</span>
+                                    <span class="score-ring-max">of 100</span>
+                                </div>
+                            </div>
+
+                            <div id="quality-stats-mini" class="quality-mini-grid"></div>
+
+                            <div class="quality-divider"></div>
+                            <h3 class="sub-heading">Cleaning Log &amp; Flags</h3>
+                            <ul id="health-issues" class="issues-list"></ul>
+
+                            <div id="schema-section" class="schema-section hidden">
+                                <div class="quality-divider"></div>
+                                <h3 class="sub-heading">Detected Schema</h3>
+                                <div id="schema-tags" class="schema-tags"></div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Visualizations -->
+                        <div class="surface-card charts-card">
+                            <div class="card-header-row">
+                                <div>
+                                    <span class="card-kicker">Visual Analytics</span>
+                                    <h2 class="card-heading">Data Visualizations</h2>
+                                </div>
+                                <span id="charts-count-badge" class="count-pill">0 charts</span>
+                            </div>
+                            <div id="charts-container" class="charts-grid"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. KEY FINDINGS & PLAIN-ENGLISH INSIGHTS -->
+                <div id="sec-insights" class="section-block">
+                    <div class="surface-card">
+                        <div class="card-header-row card-header-wrap">
+                            <div>
+                                <span class="card-kicker">Narrative Intelligence</span>
+                                <h2 class="card-heading">Plain-English Insights &amp; Recommendations</h2>
+                            </div>
+                            <div id="insights-filters" class="filter-pills" role="tablist" aria-label="Filter insights">
+                                <button type="button" class="filter-pill active" data-filter="all">All</button>
+                                <button type="button" class="filter-pill" data-filter="metrics">Metrics &amp; Overview</button>
+                                <button type="button" class="filter-pill" data-filter="patterns">Patterns &amp; Groups</button>
+                                <button type="button" class="filter-pill" data-filter="quality">Quality &amp; Risks</button>
+                            </div>
+                        </div>
+                        <div id="insights-container" class="insights-grid"></div>
+                    </div>
+                </div>
+
+                <!-- 4. CUSTOMER / DATA SEGMENTS -->
+                <div id="sec-segments" class="section-block">
+                    <div class="surface-card">
+                        <div class="card-header-row">
+                            <div>
+                                <span class="card-kicker">K-Means Clustering</span>
+                                <h2 class="card-heading">Automated Segments</h2>
+                            </div>
+                            <span id="segments-count-badge" class="count-pill">0 segments</span>
+                        </div>
+                        <div id="segments-container"></div>
+                    </div>
+                </div>
+
+                <!-- 5. FLAGGED ANOMALIES -->
+                <div id="sec-anomalies" class="section-block">
+                    <div class="surface-card anomalies-surface">
+                        <div class="card-header-row">
+                            <div>
+                                <span class="card-kicker">Isolation Forest ML</span>
+                                <h2 class="card-heading">Flagged Records &amp; Anomalies</h2>
+                            </div>
+                            <span id="anomalies-count-badge" class="count-pill">0 flagged</span>
+                        </div>
+                        <div id="anomalies-container"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div class="footer-left">
+                <span class="footer-brand"><i class="fas fa-chart-simple"></i> Data Insights</span>
+                <span class="footer-sep">&middot;</span>
+                <span>Automated Data Cleaning, Statistical Profiling &amp; ML Insights</span>
+            </div>
+            <div class="footer-right">
+                <span>Powered by FastAPI, Scikit-learn &amp; Chart.js</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/charts.js"></script>
+    <script src="/static/insights.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html>
